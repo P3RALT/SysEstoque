@@ -29,7 +29,7 @@ async function enviarEmailRequisicao(cartData, usuario) {
             
             // Mapear categorias para emails
             if (categoriasSelecionadas.includes('Materiais de Escritório') || 
-                categoriasSelecionadas.includes('Suprimentos de Escritório')) {
+                categoriasSelecionadas.includes('Suprimentos de Escritório') || categoriasSelecionadas.includes('Placa Vistoria') ) {
                 emailsDestino.push('rh@imobiliarialopes.com.br');
             }
             
@@ -134,16 +134,14 @@ function enviarEmailAlternativo(cartData, usuario) {
         let emailsDestino = [];
         
         if (categoriasSelecionadas.includes('Materiais de Escritório') || 
-            categoriasSelecionadas.includes('Suprimentos de Escritório')) {
+            categoriasSelecionadas.includes('Suprimentos de Escritório') || 
+            categoriasSelecionadas.includes('Placa Vistoria') ||
+            categoriasSelecionadas.includes('Troca Tunner')) {
             emailsDestino.push('rh@imobiliarialopes.com.br');
         }
         
         if (categoriasSelecionadas.includes('Materiais de Periféricos')) {
             emailsDestino.push('suporte@imobiliarialopes.com.br');
-        }
-
-        if (categoriasSelecionadas.includes('Troca Tunner')){
-            emailsDestino.push('recepcao@imobiliarialopes.com.br')
         }
         
         if (emailsDestino.length === 0) {
