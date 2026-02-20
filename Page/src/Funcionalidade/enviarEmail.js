@@ -3,7 +3,7 @@
 // CONFIGURAÇÕES CORRETAS DO EMAILJS
 const EMAILJS_CONFIG = {
     PUBLIC_KEY: "D-KPvFhn-l8LN2H4V",
-    SERVICE_ID: "service_7j9fmai", 
+    SERVICE_ID: "service_7j9fmai",  
     TEMPLATE_ID: "template_684yy78"
 };
 
@@ -31,7 +31,7 @@ async function enviarEmailRequisicao(cartData, usuario) {
             if (categoriasSelecionadas.includes('Materiais de Escritório') || 
                 categoriasSelecionadas.includes('Suprimentos de Escritório') || 
                 categoriasSelecionadas.includes('Placa Vistoria')) {
-                emailsDestino.push('rh@imobiliarialopes.com.br');
+                emailsDestino.push('gabrielmachado3301@gmail.com');
             }
             
             if (categoriasSelecionadas.includes('Materiais de Periféricos')) {
