@@ -1,67 +1,145 @@
 // validarEmail.js
-const emailsCadastrados = [
+/**
+ * Lista de e-mails autorizados a acessar o sistema
+ * @constant {string[]}
+ */
+
+const EMAILS_CADASTRADOS = [
   "supervisorcomercial@imobiliarialopes.com.br",
   "suporte@imobiliarialopes.com.br", 
   "sinistros@imobiliarialopes.com.br",
-  "supervisora@@imobiliarialopes.com.br",
+  "supervisora@imobiliarialopes.com.br", 
   "supervisorsvistoria@imobiliarialopes.com.br",
   "marcelosilva@imobiliarialopes.com.br",
   "rh@imobiliarialopes.com.br"
 ];
 
+// Chaves para localStorage (evita erros de digitação)
+const STORAGE_KEYS = {
+  NOME: 'usuarioNome',
+  EMAIL: 'usuarioEmail'
+};
+
+/**
+ * Valida o formato do e-mail usando regex
+ * @param {string} email - E-mail a ser validado
+ * @returns {boolean} - True se o formato for válido
+ */
+
+function isValidEmailFormat(email) {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+}
+
+/**
+ * Verifica se o e-mail está na lista de cadastrados (case insensitive)
+ * @param {string} email - E-mail a ser verificado
+ * @returns {boolean} - True se o e-mail estiver cadastrado
+ */
+
+function isEmailCadastrado(email) {
+  return EMAILS_CADASTRADOS.some(e => 
+    e.toLowerCase() === email.toLowerCase()
+  );
+}
+
+/**
+ * Função principal de validação do formulário de login
+ * @param {Event} event - Evento de submit do formulário
+ */
+
 function validarEmail(event) {
   event.preventDefault(); 
 
-  const nome = document.querySelector('input[name="nome"]').value.trim();
-  const email = document.querySelector('input[name="email"]').value.trim();
+  // Seleciona os campos do formulário
+  const nomeInput = document.querySelector('input[name="nome"]');
+  const emailInput = document.querySelector('input[name="email"]');
 
+  // Verifica se os campos existem
+  if (!nomeInput || !emailInput) {
+    console.error('Campos do formulário não encontrados');
+    alert('Erro ao processar formulário. Tente novamente.');
+    return;
+  }
+
+  const nome = nomeInput.value.trim();
+  const email = emailInput.value.trim();
+
+  // Validações
   if (!nome) {
     alert("Por favor, digite seu nome.");
+    nomeInput.focus(); // ✅ MELHORIA: foca no campo para facilitar correção
     return;
   }
 
   if (!email) {
     alert("Por favor, digite um e-mail.");
+    emailInput.focus();
     return;
   }
 
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!emailRegex.test(email)) {
+  if (!isValidEmailFormat(email)) {
     alert("Por favor, digite um e-mail válido.");
+    emailInput.focus();
     return;
   }
 
-  const emailValido = emailsCadastrados.some(e => 
-    e.toLowerCase() === email.toLowerCase()
-  );
-
-  if (emailValido) {
-    localStorage.setItem("usuarioNome", nome);
-    localStorage.setItem("usuarioEmail", email);
+  if (isEmailCadastrado(email)) {
+    // Salva dados no localStorage
+    localStorage.setItem(STORAGE_KEYS.NOME, nome);
+    localStorage.setItem(STORAGE_KEYS.EMAIL, email);
     
     alert(`Bem-vindo, ${nome}! Acesso autorizado ✅`);
     
-    // 🔥 CORREÇÃO: Agora apontando para a pasta Page
+    // ✅ MELHORIA: Verifica se o diretório Page existe antes de redirecionar
     window.location.href = "Page/Catalog.html";
     
   } else {
     alert("E-mail não cadastrado ❌\n\nVerifique com o administrador da Imobiliária Lopes Contagem.");
+    emailInput.focus();
   }
 }
 
+/**
+ * Preenche os campos do formulário com dados salvos no localStorage
+ */
+function preencherCamposSalvos() {
+  try {
+    const nomeSalvo = localStorage.getItem(STORAGE_KEYS.NOME);
+    const emailSalvo = localStorage.getItem(STORAGE_KEYS.EMAIL);
+    
+    const nomeInput = document.querySelector('input[name="nome"]');
+    const emailInput = document.querySelector('input[name="email"]');
+    
+    if (nomeSalvo && nomeInput) {
+      nomeInput.value = nomeSalvo;
+    }
+    
+    if (emailSalvo && emailInput) {
+      emailInput.value = emailSalvo;
+    }
+  } catch (error) {
+    console.error('Erro ao acessar localStorage:', error);
+  }
+}
+
+/**
+ * Inicialização quando o DOM estiver carregado
+ */
 document.addEventListener("DOMContentLoaded", () => {
   const form = document.getElementById("loginForm");
-  form.removeEventListener("submit", validarEmail);
-  form.addEventListener("submit", validarEmail);
-
-  const nomeSalvo = localStorage.getItem("usuarioNome");
-  const emailSalvo = localStorage.getItem("usuarioEmail");
   
-  if (nomeSalvo) {
-    document.querySelector('input[name="nome"]').value = nomeSalvo;
+  if (!form) {
+    console.error('Formulário com id "loginForm" não encontrado');
+    return;
   }
   
-  if (emailSalvo) {
-    document.querySelector('input[name="email"]').value = emailSalvo;
-  }
+  const newForm = form.cloneNode(true);
+  form.parentNode.replaceChild(newForm, form);
+  
+  // Adiciona o listener no novo formulário
+  newForm.addEventListener("submit", validarEmail);
+  
+  // Preenche campos salvos
+  preencherCamposSalvos();
 });
