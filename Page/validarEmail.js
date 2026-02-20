@@ -5,7 +5,8 @@ const emailsCadastrados = [
   "sinistros@imobiliarialopes.com.br",
   "supervisora@@imobiliarialopes.com.br",
   "supervisorsvistoria@imobiliarialopes.com.br",
-  "marcelosilva@imobiliarialopes.com.br"
+  "marcelosilva@imobiliarialopes.com.br",
+  "rh@imobiliarialopes.com.br
 ];
 
 function validarEmail(event) {
