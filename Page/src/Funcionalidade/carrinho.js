@@ -35,11 +35,16 @@ document.addEventListener('DOMContentLoaded', function() {
             itemName = document.getElementById('perifericosInput').value;
             quantity = parseInt(document.getElementById('perifericosQtd').value);
             category = 'Materiais de Periféricos';
+        } else if (document.getElementById('placaInput').value && document.getElementById('placaQtd').value) {
+            itemName = document.getElementById('placaInput').value;
+            quantity = parseInt(document.getElementById('placaQtd').value);
+            category = 'Placa Vistoria';
         } else if (document.getElementById('tonnerInput').value && document.getElementById('tonnerQtd').value) {
             itemName = document.getElementById('tonnerInput').value;
             quantity = parseInt(document.getElementById('tonnerQtd').value);
             category = 'Troca Tonner';
         }
+
         
         if (itemName && quantity > 0) {
             return {
@@ -119,6 +124,8 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('perifericosQtd').value = '';
         document.getElementById('tonnerInput').value = '';
         document.getElementById('tonnerQtd').value = '';
+        document.getElementById('placaInput').value = '';
+        document.getElementById('placaQtd').value = '';
     }
     
     // Função para enviar requisição
