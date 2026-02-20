@@ -1,13 +1,11 @@
 // validarEmail.js
 const emailsCadastrados = [
-  "contato@lopescontagem.com",
+  "supervisorcomercial@imobiliarialopes.com.br",
   "suporte@imobiliarialopes.com.br", 
-  "vendas@lopescontagem.com",
-  "adm@lopescontagem.com",
-  "gabriel@lopescontagem.com",
-  "maria@lopescontagem.com",
-  "joao@lopescontagem.com",
-  "ana@lopescontagem.com"
+  "sinistros@imobiliarialopes.com.br",
+  "supervisora@@imobiliarialopes.com.br",
+  "supervisorsvistoria@imobiliarialopes.com.br",
+  "marcelosilva@imobiliarialopes.com.br"
 ];
 
 function validarEmail(event) {
