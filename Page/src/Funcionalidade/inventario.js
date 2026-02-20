@@ -39,7 +39,8 @@ function popularDatalists() {
         'escritorioItems': 'Materiais de Escritório',
         'suprimentosItems': 'Suprimentos de Escritório',
         'perifericosItems': 'Materiais Periféricos',
-        'tonnerItems': 'Toners de Impressora'
+        'tonnerItems': 'Toners de Impressora',
+        'placaItems' : 'Placa Vistoria'
     };
 
     Object.keys(mapeamentoCategorias).forEach(datalistId => {
@@ -103,7 +104,8 @@ function obterCategoriaSheet(categoriaForm) {
         'Materiais de Escritório': 'Materiais de Escritório',
         'Suprimentos de Escritório': 'Suprimentos de Escritório',
         'Materiais de Periféricos': 'Materiais Periféricos',
-        'Troca Tonner': 'Toners de Impressora'
+        'Troca Tonner': 'Toners de Impressora',
+        'placaItems' : 'Placa Vistoria'
     };
     
     return mapeamento[categoriaForm] || categoriaForm;
