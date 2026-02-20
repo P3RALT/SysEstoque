@@ -29,7 +29,8 @@ async function enviarEmailRequisicao(cartData, usuario) {
             
             // Mapear categorias para emails
             if (categoriasSelecionadas.includes('Materiais de Escritório') || 
-                categoriasSelecionadas.includes('Suprimentos de Escritório') || categoriasSelecionadas.includes('Placa Vistoria') ) {
+                categoriasSelecionadas.includes('Suprimentos de Escritório') || 
+                categoriasSelecionadas.includes('Placa Vistoria')) {
                 emailsDestino.push('rh@imobiliarialopes.com.br');
             }
             
@@ -137,7 +138,7 @@ function enviarEmailAlternativo(cartData, usuario) {
             categoriasSelecionadas.includes('Suprimentos de Escritório') || 
             categoriasSelecionadas.includes('Placa Vistoria') ||
             categoriasSelecionadas.includes('Troca Tunner')) {
-            emailsDestino.push('rh@imobiliarialopes.com.br');
+            emailsDestino.push('suporte@imobiliarialopes.com.br');
         }
         
         if (categoriasSelecionadas.includes('Materiais de Periféricos')) {
