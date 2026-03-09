@@ -7,6 +7,20 @@ const EMAILJS_CONFIG = {
     TEMPLATE_ID: "template_684yy78"
 };
 
+// Mapeamento claro de categorias para emails
+// RH = rh@imobiliarialopes.com.br (para todas categorias exceto Periféricos)
+// Suporte = suporte@imobiliarialopes.com.br (apenas para Materiais de Periféricos)
+const EMAIL_CATEGORY_MAPPING = {
+    'Materiais de Escritório': 'rh@imobiliarialopes.com.br',  // RH
+    'Suprimentos de Escritório': 'rh@imobiliarialopes.com.br', // RH
+    'Placa Vistoria': 'rh@imobiliarialopes.com.br',           // RH
+    'Troca Tunner': 'rh@imobiliarialopes.com.br',             // RH
+    'Materiais de Periféricos': 'suporte@imobiliarialopes.com.br' // Suporte
+};
+
+// Email do RH para fallback
+const RH_EMAIL = 'rh@imobiliarialopes.com.br';
+
 // Inicializar EmailJS com as credenciais corretas
 console.log('🔧 Inicializando EmailJS com:', EMAILJS_CONFIG);
 emailjs.init(EMAILJS_CONFIG.PUBLIC_KEY);
@@ -25,25 +39,26 @@ async function enviarEmailRequisicao(cartData, usuario) {
             
             // Determinar para quais emails enviar baseado nas categorias selecionadas
             const categoriasSelecionadas = [...new Set(cartData.map(item => item.category))];
-            const emailsDestino = [];
+            console.log('📦 Categorias selecionadas:', categoriasSelecionadas);
             
-            // Mapear categorias para emails
-            if (categoriasSelecionadas.includes('Materiais de Escritório') || 
-                categoriasSelecionadas.includes('Suprimentos de Escritório') || 
-                categoriasSelecionadas.includes('Placa Vistoria')) {
-                emailsDestino.push('gabrielmachado3301@gmail.com');
+            // Usar um Set para evitar emails duplicados
+            const emailsDestinoSet = new Set();
+            
+            // Verificar se tem Materiais de Periféricos
+            const temPerifericos = categoriasSelecionadas.includes('Materiais de Periféricos');
+            
+            // Para TODAS as categorias, o RH sempre recebe cópia
+            emailsDestinoSet.add(RH_EMAIL);
+            console.log('📧 RH sempre recebe cópia:', RH_EMAIL);
+            
+            // Se tiver periféricos, também envia para suporte
+            if (temPerifericos) {
+                emailsDestinoSet.add('suporte@imobiliarialopes.com.br');
+                console.log('📧 Materiais de Periféricos detectado → Também enviando para suporte');
             }
             
-            if (categoriasSelecionadas.includes('Materiais de Periféricos')) {
-                emailsDestino.push('suporte@imobiliarialopes.com.br');
-            }
-            
-            // Se não houver emails destino, não enviar
-            if (emailsDestino.length === 0) {
-                console.log('Nenhum email destino encontrado');
-                resolve({ success: false, message: 'Nenhum email configurado para as categorias selecionadas' });
-                return;
-            }
+            const emailsDestino = Array.from(emailsDestinoSet);
+            console.log('📧 Emails destino final:', emailsDestino);
 
             // Preparar template do email
             const templateParams = {
@@ -57,9 +72,6 @@ async function enviarEmailRequisicao(cartData, usuario) {
                 ).join('\n')
             };
 
-            console.log('📧 Preparando envio para:', emailsDestino);
-            console.log('📧 Service ID:', EMAILJS_CONFIG.SERVICE_ID);
-            console.log('📧 Template ID:', EMAILJS_CONFIG.TEMPLATE_ID);
             console.log('📧 Template Params:', templateParams);
 
             // Enviar email usando EmailJS com timeout
@@ -132,22 +144,22 @@ function enviarEmailAlternativo(cartData, usuario) {
         console.log('📧 Usando método mailto: alternativo...');
         
         const categoriasSelecionadas = [...new Set(cartData.map(item => item.category))];
-        let emailsDestino = [];
+        console.log('📦 Categorias selecionadas (alternativo):', categoriasSelecionadas);
         
-        if (categoriasSelecionadas.includes('Materiais de Escritório') || 
-            categoriasSelecionadas.includes('Suprimentos de Escritório') || 
-            categoriasSelecionadas.includes('Placa Vistoria') ||
-            categoriasSelecionadas.includes('Troca Tunner')) {
-            emailsDestino.push('suporte@imobiliarialopes.com.br');
+        // Usar a mesma lógica do método principal
+        const emailsDestinoSet = new Set();
+        
+        // RH sempre recebe
+        emailsDestinoSet.add(RH_EMAIL);
+        
+        // Verificar se tem periféricos
+        const temPerifericos = categoriasSelecionadas.includes('Materiais de Periféricos');
+        if (temPerifericos) {
+            emailsDestinoSet.add('suporte@imobiliarialopes.com.br');
         }
         
-        if (categoriasSelecionadas.includes('Materiais de Periféricos')) {
-            emailsDestino.push('suporte@imobiliarialopes.com.br');
-        }
-        
-        if (emailsDestino.length === 0) {
-            emailsDestino = ['suporte@imobiliarialopes.com.br']; // Email padrão
-        }
+        const emailsDestino = Array.from(emailsDestinoSet);
+        console.log('📧 Emails destino (alternativo):', emailsDestino);
 
         const assunto = `Solicitação de Materiais - ${usuario.nome}`;
         
@@ -195,22 +207,31 @@ async function tentarEnvioAlternativo(cartData, usuario, erroOriginal) {
     try {
         console.log('🔄 Usando método alternativo de notificação...');
         
+        // Determinar emails para mostrar na mensagem
+        const categoriasSelecionadas = [...new Set(cartData.map(item => item.category))];
+        const temPerifericos = categoriasSelecionadas.includes('Materiais de Periféricos');
+        
+        let emailsParaEnviar = RH_EMAIL;
+        if (temPerifericos) {
+            emailsParaEnviar = `${RH_EMAIL} e suporte@imobiliarialopes.com.br`;
+        }
+        
         // Criar um resumo simples que pode ser copiado
         const resumoItens = cartData.map(item => 
             `${item.name} - ${item.quantity} unid (${item.category})`
         ).join('\n');
         
-        const textoParaCopiar = `SOLICITAÇÃO DE MATERIAIS\n\nUsuário: ${usuario.nome} (${usuario.email})\nData: ${new Date().toLocaleString('pt-BR')}\n\nItens:\n${resumoItens}\n\nTotal: ${cartData.length} itens`;
+        const textoParaCopiar = `SOLICITAÇÃO DE MATERIAIS\n\nUsuário: ${usuario.nome} (${usuario.email})\nData: ${new Date().toLocaleString('pt-BR')}\n\nItens:\n${resumoItens}\n\nTotal: ${cartData.length} itens\n\nEnviar para: ${emailsParaEnviar}`;
         
         // Mostrar opção para copiar
         const confirmacao = confirm(
-            `❌ Email não pôde ser enviado automaticamente.\n\n${erroOriginal}\n\nClique em OK para copiar os dados da requisição e enviar manualmente por email.`
+            `❌ Email não pôde ser enviado automaticamente.\n\n${erroOriginal}\n\nEnviar para: ${emailsParaEnviar}\n\nClique em OK para copiar os dados da requisição e enviar manualmente por email.`
         );
         
         if (confirmacao) {
             // Copiar para área de transferência
             await navigator.clipboard.writeText(textoParaCopiar);
-            alert('✅ Dados copiados! Cole no seu email e envie para os responsáveis.');
+            alert(`✅ Dados copiados! Cole no seu email e envie para ${emailsParaEnviar}.`);
             return true;
         }
         return false;
@@ -227,8 +248,12 @@ window.emailUtils = {
     enviarEmailRequisicao,
     enviarEmailAlternativo,
     tentarEnvioAlternativo,
+    EMAIL_CATEGORY_MAPPING,
+    RH_EMAIL,
     EMAILJS_CONFIG
 };
 
 console.log('✅ Módulo de email carregado com sucesso');
 console.log('🔑 Configurações:', EMAILJS_CONFIG);
+console.log('📧 Email RH:', RH_EMAIL);
+console.log('📧 Mapeamento:', EMAIL_CATEGORY_MAPPING);
